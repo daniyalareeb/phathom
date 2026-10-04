@@ -8,3 +8,9 @@ node_modules/
 extension/dist/
 *.egg-info/
 .claude/
+
+# planning docs (kept local)
+PLAN.md
+SPEC.md
+EXTENSION_SPEC.md
+BUILD_LOG.md
