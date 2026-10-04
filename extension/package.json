@@ -1,0 +1,31 @@
+{
+  "name": "myphathom-extension",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "MyPhathom v2 Chrome extension (TypeScript + Vite, React UI).",
+  "scripts": {
+    "test": "vitest run",
+    "build": "vite build --config vite.build.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/chrome": "^0.3.4",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.51.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

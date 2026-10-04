@@ -1,0 +1,15 @@
+[Unit]
+Description=Phathom WhatsApp call assistant (daemon)
+# The database is embedded (data/db); no separate DB unit.
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/MyProjects/MyPhathom
+Environment=PATH=%h/MyProjects/MyPhathom/.venv/bin:/usr/bin:/bin
+ExecStart=%h/MyProjects/MyPhathom/.venv/bin/phathom start
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

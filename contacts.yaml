@@ -1,0 +1,7 @@
+# policy: "all" = answer everyone not blocked; "allowlist" = answer only listed contacts
+# Edit from the dashboard's Contacts page (it saves here).
+policy: all
+block:
+  - "Unknown"          # matches the caller label shown by WhatsApp
+allow: []
+notes: {}              # free-text context the bot may use, keyed by the name WhatsApp shows

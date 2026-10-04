@@ -1,0 +1,42 @@
+[project]
+name = "phathom"
+version = "0.0.1"
+description = "MyPhathom — local WhatsApp call assistant"
+requires-python = ">=3.10"
+dependencies = [
+  "playwright",
+  "groq",
+  "surrealdb",
+  "edge-tts",
+  "webrtcvad-wheels",
+  "typer",
+  "rich",
+  "pydantic-settings",
+  "python-dotenv",
+  "pyyaml",
+  "tenacity",
+  "fastapi",
+  "uvicorn",
+  "python-multipart",
+  "websockets",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "pytest-asyncio",
+]
+
+[project.scripts]
+phathom = "phathom.cli:app"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["phathom*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

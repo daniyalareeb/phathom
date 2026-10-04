@@ -1,0 +1,15 @@
+[Unit]
+Description=Phathom v2 local server (extension backend)
+# The database is embedded in `phathom serve` (data/db); no separate DB unit.
+After=graphical-session.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/MyProjects/MyPhathom
+Environment=PATH=%h/MyProjects/MyPhathom/.venv/bin:/usr/bin:/bin
+ExecStart=%h/MyProjects/MyPhathom/.venv/bin/phathom serve
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

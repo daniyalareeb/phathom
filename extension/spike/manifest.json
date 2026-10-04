@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "MyPhathom (spike)",
+  "version": "0.0.0",
+  "description": "Phase 0 spike: prove WhatsApp Web call audio tapping. No UI beyond test buttons.",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "tabs", "notifications"],
+  "host_permissions": ["https://web.whatsapp.com/*", "http://127.0.0.1:8765/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_popup": "popup.html", "default_title": "MyPhathom spike" },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["inject.js"],
+      "world": "MAIN",
+      "run_at": "document_start",
+      "all_frames": true
+    },
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    { "resources": ["worklets/pcm-tap.js"], "matches": ["https://web.whatsapp.com/*"] }
+  ],
+  "commands": {
+    "play-test-tone": {
+      "suggested_key": { "default": "Ctrl+Shift+Y" },
+      "description": "Play 3 s 440 Hz test tone through the bot path"
+    }
+  }
+}

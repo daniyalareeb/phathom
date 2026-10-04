@@ -1,0 +1,13 @@
+[Unit]
+Description=Phathom SurrealDB (local call store)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/MyProjects/MyPhathom
+ExecStart=%h/MyProjects/MyPhathom/scripts/run_db.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
