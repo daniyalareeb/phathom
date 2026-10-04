@@ -563,7 +563,11 @@ function AskPage({ query, chat }: { query: URLSearchParams; chat?: string }) {
     if (pre) void ask(pre);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  React.useEffect(() => endRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' }), [log]);
+  // Braces matter: newer Chrome returns a Promise from scrollIntoView, and an
+  // effect that returns a non-function crashes React on cleanup.
+  React.useEffect(() => {
+    endRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, [log]);
 
   const suggestions = ['What did Ahmed want?', 'Any action items for me this week?', 'What did Ammi say last time?'];
   return (

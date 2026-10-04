@@ -74,11 +74,32 @@ function wsUrl(base: string, tok: string | null): string {
   return tok ? `${u}?token=${encodeURIComponent(tok)}` : u;
 }
 
+// Events that arrive while the socket is (re)connecting are queued, not dropped:
+// a lost call_started/call_ended means a call that never shows up.
+let pendingEvents: string[] = [];
+
 function wsSend(obj: unknown) {
   try {
-    if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj));
+    const s = JSON.stringify(obj);
+    if (ws && ws.readyState === WebSocket.OPEN) ws.send(s);
+    else if ((obj as { t?: string })?.t !== 'ping') {
+      pendingEvents.push(s);
+      if (pendingEvents.length > 200) pendingEvents.shift();
+    }
   } catch {
     /* noop */
+  }
+}
+
+function flushPendingEvents() {
+  const q = pendingEvents;
+  pendingEvents = [];
+  for (const s of q) {
+    try {
+      ws?.send(s);
+    } catch {
+      /* noop */
+    }
   }
 }
 
@@ -170,6 +191,7 @@ async function connectWs() {
     setBadge(serverState ? 'ok' : 'ok');
     audioBuffer = [];
     wsSend({ t: 'hello', ext_version: EXT_VERSION, tab_id: activeTabId });
+    flushPendingEvents();
   };
   ws.onmessage = (ev: MessageEvent) => {
     try {
@@ -470,6 +492,15 @@ chrome.runtime.onMessage.addListener((msg: Record<string, unknown>) => {
 
 // Keep-alive ping every 20 s (an open WS with traffic keeps MV3 workers alive).
 setInterval(() => wsSend({ t: 'ping' }), 20000);
+
+// After an install/update/reload, scripts in already-open WhatsApp tabs are cut
+// off from the extension and can never reconnect. Reload those tabs so call
+// detection works without the user having to remember.
+chrome.runtime.onInstalled.addListener(() => {
+  void waTabs().then((tabs) => {
+    for (const t of tabs) if (t.id != null) void chrome.tabs.reload(t.id).catch(() => {});
+  });
+});
 
 // Reconnect with backoff (1, 2, 5, 10, 30 s) — scheduled on close; also retry
 // pairing when the token appears later.

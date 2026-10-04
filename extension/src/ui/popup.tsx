@@ -139,6 +139,7 @@ function Popup() {
   const { state, error, reload } = useServerState(3000);
   const [paired, setPaired] = React.useState<boolean | null>(null);
   const [health, setHealth] = React.useState<{ db: string; groq_key: string } | null>(null);
+  const [tabOk, setTabOk] = React.useState<boolean | null>(null);
   const [last, setLast] = React.useState<{ id: string; caller: string; duration_s?: number | null; started_at: string; title?: string | null } | null>(null);
 
   React.useEffect(() => {
@@ -147,6 +148,7 @@ function Popup() {
   React.useEffect(() => {
     if (!paired || error) return;
     api.health().then(setHealth).catch(() => setHealth(null));
+    api.diagnostics().then((d) => setTabOk(!!d.tab?.reporting)).catch(() => setTabOk(null));
     api.calls({ limit: '1' }).then((r) => setLast(r.calls[0] ?? null)).catch(() => {});
   }, [paired, error]);
 
@@ -181,8 +183,22 @@ function Popup() {
             <Chip tone="live" dot>Server</Chip>
             <Chip tone={health?.db === 'up' ? 'live' : 'warn'} dot>Database</Chip>
             <Chip tone={health?.groq_key === 'set' ? 'live' : 'warn'} dot>{health?.groq_key === 'missing' ? 'Groq key missing' : 'Groq'}</Chip>
-            <Chip tone={wa === false ? 'warn' : wa ? 'live' : 'neutral'} dot>{wa === false ? 'WhatsApp logged out' : 'WhatsApp'}</Chip>
+            <Chip tone={wa === false || tabOk === false ? 'warn' : tabOk ? 'live' : 'neutral'} dot>
+              {wa === false ? 'WhatsApp logged out' : tabOk === false ? 'WhatsApp tab not connected' : 'WhatsApp'}
+            </Chip>
           </div>
+          {tabOk === false && (
+            <div className="card card-tight" style={{ borderLeft: '3px solid var(--warn)', fontSize: 13 }}>
+              Phathom can’t see WhatsApp Web. Open <strong>web.whatsapp.com</strong> in this Chrome, or reload that tab.
+              <button className="btn btn-sm" style={{ marginTop: 8 }} onClick={async () => {
+                const tabs = await chrome.tabs.query({ url: 'https://web.whatsapp.com/*' });
+                if (tabs[0]?.id != null) await chrome.tabs.reload(tabs[0].id);
+                else await chrome.tabs.create({ url: 'https://web.whatsapp.com/' });
+              }}>
+                Open / reload WhatsApp Web
+              </button>
+            </div>
+          )}
           {last && (
             <button className="row" style={{ padding: '8px 10px', margin: '0 -10px', width: 'calc(100% + 20px)' }} onClick={() => openPage(`app.html#/calls/${last.id}`)}>
               <span className="avatar">{(last.caller || '?').charAt(0).toUpperCase()}</span>

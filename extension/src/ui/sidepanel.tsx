@@ -263,7 +263,9 @@ function Idle() {
     api.brief().then((b) => setBrief(b.brief)).catch((e) => setErr(errText(e)));
     api.state().then(setState).catch(() => {});
   }, []);
-  React.useEffect(load, [load]);
+  React.useEffect(() => {
+    load();
+  }, [load]);
   if (err) return <ErrorCard message={err} onRetry={load} />;
   const mode = modeOf(state);
   return (
